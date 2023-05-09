@@ -10,7 +10,12 @@
 # counts column
 
 ./bin/star2matrix.py \
-    -p -C \
     -q '-wheat-cs' -b \
     -o matrix.tsv \
     -i data/star-wheat/*/ReadsPerGene.out.tab
+
+# ./bin/star2matrix.py \
+#     -p -C \
+#     -q '-wheat-cs' -b \
+#     -o matrix.tsv \
+#     -i data/star-wheat/*/ReadsPerGene.out.tab

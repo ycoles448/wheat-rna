@@ -79,8 +79,7 @@ if (stranded is True) and (combine is False):
 elif (stranded is True) and (combine is True):
     col = (2, 3)
 else:
-    print("Cannot process STAR non-stranded output, not-yet-implemented")
-    sys.exit(1)
+    col = 1
 
 
 # Create empty matrix

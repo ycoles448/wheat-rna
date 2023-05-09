@@ -91,7 +91,8 @@ pca2plot <- function(output, pca = pca, title = NA, type = NA) {
 # Loading data and adding metadata not present in metadata matrix
 # TODO: Add data into matrix instead of adding data here
 # Loading in data
-counts.wheat <- read.csv("wheat-matrix.tsv", sep = "\t", header = TRUE)
+## counts.wheat <- read.csv("wheat-matrix.tsv", sep = "\t", header = TRUE)
+counts.wheat <- read.csv("wheat-matrix.unstranded.tsv", sep = "\t", header = TRUE)
 counts.fungi <- read.csv("ptr-matrix.tsv", sep = "\t", header = TRUE)
 meta.wheat <- read.csv("meta-reduced.tsv", sep = "\t", header = TRUE)
 
@@ -205,8 +206,6 @@ dds.wheat <- DESeqDataSetFromMatrix(
   colData = meta.wheat,
   design = formula("~ time + control + rating")
 )
-
-dds.wheat
 
 vst.wheat <- vst(dds.wheat, blind = FALSE)
 pca.wheat <- plotPCA(vst.wheat, intgroup = f, returnData = TRUE, ntop = 2000)
