@@ -92,7 +92,7 @@ pca2plot <- function(output, pca = pca, title = NA, type = NA) {
 # TODO: Add data into matrix instead of adding data here
 # Loading in data
 ## counts.wheat <- read.csv("wheat-matrix.tsv", sep = "\t", header = TRUE)
-counts.wheat <- read.csv("wheat-matrix.unstranded.tsv", sep = "\t", header = TRUE)
+counts.wheat <- read.csv("wheat-matrix.complement.tsv", sep = "\t", header = TRUE)
 counts.fungi <- read.csv("ptr-matrix.tsv", sep = "\t", header = TRUE)
 meta.wheat <- read.csv("meta-reduced.tsv", sep = "\t", header = TRUE)
 
@@ -122,14 +122,15 @@ meta.wheat[, "rating"][meta.wheat[, "cultivar"] == "Magenta"] <- "MR"
 meta.wheat[, "rating"][meta.wheat[, "cultivar"] == "Wyalkatchem"] <- "MS"
 
 # Groups
-c <- 1
-for (i in cultivars) {
-  meta.wheat[meta.wheat[, "cultivar"] == i & meta.wheat[, "time"] == "early", "group"] <- c
-  c <- c + 1
-  meta.wheat[meta.wheat[, "cultivar"] == i & meta.wheat[, "time"] == "late", "group"] <- c
-  c <- c + 1
-}
-meta.wheat[, "group"] <- as.roman(meta.wheat[, "group"])
+# Old groups, clusters samples by cultivar and sampling time
+## c <- 1
+## for (i in cultivars) {
+##   meta.wheat[meta.wheat[, "cultivar"] == i & meta.wheat[, "time"] == "early", "group"] <- c
+##   c <- c + 1
+##   meta.wheat[meta.wheat[, "cultivar"] == i & meta.wheat[, "time"] == "late", "group"] <- c
+##   c <- c + 1
+## }
+# New groups, clusters by cultivar, control and time
 
 
 # Colours
@@ -150,17 +151,30 @@ counts.fungi <- counts.fungi[, colnames(counts.wheat) %in% meta.fungi[, "sample"
 
 
 # Reads per sample
+counts <- colSums(counts.wheat) / 1000000
+names(counts) <- meta.wheat[, "sample"]
+df <- cbind(meta.wheat, counts)
+
+p <- ggplot(df, aes(x = counts, y = sample, fill = cultivar)) +
+  geom_col() +
+  theme_classic() +
+  theme() +
+  xlab("Number of aligned reads (million)") +
+  ylab("Sample") +
+  ggtitle("Aligned reads by sample")
+## ggsave(filename = "read-counts.png", plot = p, width = 3000, height = 3000, units = "px")
 
 
 # Setting variables
 # Set column to use for grouping
 f <- "rating"
 eff <- 1
-pval <- 0.1
+sig <- 0.05
 
 # Set contrast
 # First two contrasts are compared in Venn diagram
 contrasts <- list(
+  c("control", "control", "disease"),
   c("rating", "R", "SVS"),
   c("time", "early", "late"),
   c("toxc", "resistant", "susceptible")
@@ -204,7 +218,7 @@ contrasts <- list(
 dds.wheat <- DESeqDataSetFromMatrix(
   countData = counts.wheat,
   colData = meta.wheat,
-  design = formula("~ time + control + rating")
+  design = formula("~ group")
 )
 
 vst.wheat <- vst(dds.wheat, blind = FALSE)
@@ -225,15 +239,22 @@ pca.wheat[, "time"] <- meta.wheat[, "time"]
 ## ggsave(filename = "wheat+fungi-pca.png", plot = ggarrange(p1, p2), width = 6000, height = (6000 / 16) * 9, units = "px")
 ## ggsave(filename = "wheat-controls+disease-pca.png", plot = ggarrange(p3, p4), width = 6000, height = (6000 / 16) * 9, units = "px")
 
+options("width" = 256)
+meta.wheat
+
+
+# Contrasts between groups
 dds.wheat <- DESeq(dds.wheat, parallel = TRUE)
-res.wheat <- results(
-  dds.wheat,
-  alpha = 0.05,
-  contrast = unlist(contrasts[1]),
-  filterFun = ihw,
-  parallel = TRUE
-)
-sig.wheat <- subset(res.wheat, (padj < pval & !is.na(padj)) & abs(log2FoldChange) >= eff)
+res.wheat <- results(dds.wheat, alpha = 0.05, contrast = c("group", "1", "2"), parallel = TRUE)
+
+## res.wheat <- results(
+##   dds.wheat,
+##   alpha = 0.05,
+##   contrast = unlist(contrasts[1]),
+##   filterFun = ihw,
+##   parallel = TRUE
+## )
+sig.wheat <- subset(res.wheat, (padj < sig & !is.na(padj)) & abs(log2FoldChange) >= eff)
 
 
 ## sig.up <- subset(sig, log2FoldChange >= 1)
@@ -334,16 +355,18 @@ terms <- c("CC", "BP", "MF")
 sig.up <- subset(sig.wheat, log2FoldChange > eff)
 sig.dn <- subset(sig.wheat, log2FoldChange < eff)
 
-sig.up
-sig.dn
-
 l.up <- sig.up[, "pvalue"]
 l.dn <- sig.dn[, "pvalue"]
 names(l.up) <- rownames(sig.up)
 names(l.dn) <- rownames(sig.dn)
 
+## selGenes <- function(x) {
+##   return(x < sig)
+## }
+
+# Using all genes for testing, regardless of padj value
 selGenes <- function(x) {
-  return(x < 0.01)
+  return(TRUE)
 }
 
 l <- list()
@@ -431,7 +454,7 @@ for (t in terms) {
 go <- rbindlist(l, use.names = TRUE)
 go[, "species"] <- "Wheat"
 mf <- subset(go, domain == "MF")
-mf <- subset(mf, mf$Significant / mf$Annotated > 0.7 & mf$weightFisher < 0.3)
+mf <- subset(mf, mf$Significant / mf$Annotated > 0.7 & mf$weightFisher < 0.1)
 
 n <- length(unique(mf$Term))
 k <- mf$Significant
