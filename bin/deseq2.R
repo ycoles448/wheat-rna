@@ -20,6 +20,7 @@ library("topGO")
 library("data.table")
 library("stringr")
 library("ballgown")
+library("tools")
 
 
 # Allow parallelisation
@@ -130,14 +131,26 @@ meta.wheat[, "rating"][meta.wheat[, "cultivar"] == "Wyalkatchem"] <- "MS"
 ##   meta.wheat[meta.wheat[, "cultivar"] == i & meta.wheat[, "time"] == "late", "group"] <- c
 ##   c <- c + 1
 ## }
-# New groups, clusters by cultivar, control and time
 
-
-# Colours
-c <- ggColours(7)
-for (i in seq(1, 7)) {
-  meta.wheat[meta.wheat[, "cultivar"] == cultivars[i], "colour"] <- c[i]
+# New groups, clusters by cultivar, control and times
+# TODO: Find a better way to CamelCase groups, very convoluted and should use exact matches
+meta.wheat[, "group"] <- as.character(NA)
+for (i in seq(1, nrow(meta.wheat))) {
+  if (substr(as.character(meta.wheat[i, "cultivar"]), 1, 1) == "Z") {
+    a <- paste0("Z", substr(as.character(meta.wheat[i, "cultivar"]), 4, 5))
+  } else {
+    a <- meta.wheat[i, "cultivar"]
+  }
+  b <- toTitleCase(as.character(meta.wheat[i, "control"]))
+  c <- toTitleCase(as.character(meta.wheat[i, "time"]))
+  meta.wheat[i, "group"] <- paste0(a, b, c)
 }
+
+## # Colours
+## c <- ggColours(7)
+## for (i in seq(1, 7)) {
+##   meta.wheat[meta.wheat[, "cultivar"] == cultivars[i], "colour"] <- c[i]
+## }
 
 # Correcting columns to factors
 for (i in c("sample", "cultivar", "control", "time", "treatment", "pool", "row", "toxa", "toxc", "rating", "group")) {
@@ -173,6 +186,7 @@ sig <- 0.05
 
 # Set contrast
 # First two contrasts are compared in Venn diagram
+# Not used anymore
 contrasts <- list(
   c("control", "control", "disease"),
   c("rating", "R", "SVS"),
