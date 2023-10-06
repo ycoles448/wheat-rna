@@ -1,0 +1,42 @@
+[plots]
+size.std.x = 3000
+size.std.y = 3000
+
+font.size.title = 16
+font.size.subtitle = 12
+font.size.axis = 10
+font.size.tick = 8
+font.size.legend = 10
+font.size.label = 8
+
+# Polar coords
+font.angle.x = 90
+font.angle.y = 0
+
+clr1 = "#FFFFFF"
+clr2 = "#FF0000"
+
+[plots.names]
+barplot.totalCounts.title = "Total gene counts per group"
+
+scatter.pairCounts.title = "Gene expression vs. total expression"
+
+lines.clustExpr.title = "Cluster expression with GO annotations"
+
+heatmap.geneCounts.title = "Gene expression"
+heatmap.geneCounts.legend = "Gene categories"
+
+venn.sdeg = "Differential expression of all cultivars"
+
+barplot.goDist.title = "Distribution of GO terms"
+
+xlab.cultivar = "Cultivar"
+xlab.geneCounts = "Gene counts"
+xlab.goDist = "Annotation counts"
+
+ylab.totalCounts = "Gene counts (total)"
+ylab.goDist = "NULL"
+ylab.zscore = "z-score"
+
+lab.gene1 = "Gene 1: "
+lab.gene2 = "Gene 2: "

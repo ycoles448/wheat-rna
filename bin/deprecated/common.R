@@ -1,0 +1,5 @@
+control <- c("control", "disease")
+cultivar <- c("Machete", "Magenta", "Phantom", "Wyalkatchem", "Yitpi", "ZWB11Q56", "ZWB12Q89")
+cultivarOrdered <- c("Machete", "Phantom", "Yitpi", "Magenta", "Wyalkatchem", "ZWB11Q56", "ZWB12Q89")
+rating <- c("SVS", "MS", "MR", "R")
+time <- c("early", "late")

@@ -1,0 +1,36 @@
+[general]
+threads = 0
+
+[data]
+# Top-level paths
+data = "data"
+
+# Data subdirectories
+clust = "clust"
+genes = "genes"
+go = "go"
+plots = "plots"
+tom = "tom"
+genesFungi = "data/genes/ptr"
+
+[analyses]
+contrast = "groupCultivarTime" # See meta.tsv for valid contrasts
+pca = true
+
+[factors]
+# Apply "Ordered" after a factor name to override the factor order
+control = ["control", "disease"]
+cultivar = ["Machete", "Magenta", "Phantom", "Wyalkatchem", "Yitpi", "ZWB11Q56", "ZWB12Q89"]
+cultivarOrdered = ["Machete", "Phantom", "Yitpi", "Magenta", "Wyalkatchem", "ZWB11Q56", "ZWB12Q89"]
+rating = ["SVS", "MS", "MR", "R"]
+time = ["early", "late"]
+
+[fungi]
+species = "ptr"
+counts = "data/ptr.tsv"
+meta = "data/ptrMeta.tsv"
+traits = "data/ptrTraits.tsv"
+factors = ["time", "cultivar"] # See meta.tsv for factor names, order independent
+extraFactors = ["rating"] # Secondary/supplementary analysis, not used for linear factors
+hkg = "actin" # Make sure house-keeping gene is also defined in genes.toml!
+nreps = 3

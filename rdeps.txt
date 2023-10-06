@@ -1,0 +1,43 @@
+# R dependencies list, works for CRAN and BioConductor
+# Comment lines start with a hash (#) character
+
+# Core
+BiocManager
+BiocParallel
+R.utils
+GetoptLong
+doParallel
+parallel
+foreach
+tools
+data.table
+rlang
+purrr
+magick
+moduleColor
+cowplot
+forcats
+
+# Configs
+configr
+
+# Analyses
+chromoMap
+DESeq2
+edgeR
+# IHW
+clusterProfiler
+topGO
+FactoMineR
+WGCNA
+
+# Graphics
+RColorBrewer
+ComplexHeatmap
+ggplot2
+ggpmisc
+ggVennDiagram
+gtable
+grid
+gridExtra
+viridis
