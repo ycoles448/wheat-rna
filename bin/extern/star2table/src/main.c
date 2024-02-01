@@ -4,6 +4,9 @@
 #include "files.h"
 #include "macros.h"
 
+/* Initialise global variables */
+char *outfile = NULL;
+
 int main(int argc, char **argv) {
   FILE *f;
 
@@ -13,16 +16,16 @@ int main(int argc, char **argv) {
   int i;
 
   /* Handle arguments */
+  processArgs(argc, argv);
+
   if (argc < 1) {
     printf(PROMPT_HELP, argv[0]);
     return ERROR_HELP;
   };
 
   files = getFileList(argc, argv);
-  for (i = 0; i < files.len; i++) {
-    printf("%s\n", files.list[i]);
-  }
 
+  logs = malloc(files.len * sizeof(Log));
   for (i = 0; i < files.len; i++) {
     /* Load file */
     f = fopen(files.list[i], "r");
@@ -32,11 +35,9 @@ int main(int argc, char **argv) {
     }
 
     /* Read in logs */
-    printf("Reading log file:	%s\n", files.list[i]);
-    logs = (Log *)malloc(files.len * sizeof(Log));
-
+    /* printf("Reading log file:	%s\n", files.list[i]); */
     logs[i] = readLog(f);
-    printLog(logs[i]);
+    /* printLog(logs[i]); */
 
     fclose(f);
   }

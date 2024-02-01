@@ -5,6 +5,7 @@
 
 #include "types.h"
 
+void processArgs(int argc, char **argv);
 void stripSpaceLeft(char *s);
 FileList getFileList(int argc, char **argv);
 void writeTable(int len, Log *logs);

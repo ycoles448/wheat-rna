@@ -16,7 +16,9 @@ purrr
 magick
 moduleColor
 cowplot
-forcats
+ggpubr
+# forcats
+R6
 
 # Configs
 configr
@@ -26,6 +28,7 @@ chromoMap
 DESeq2
 edgeR
 # IHW
+# ggtree
 clusterProfiler
 topGO
 FactoMineR
@@ -34,8 +37,10 @@ WGCNA
 # Graphics
 RColorBrewer
 ComplexHeatmap
+heatmaply
 ggplot2
 ggpmisc
+ggdendro
 ggVennDiagram
 gtable
 grid

@@ -3,19 +3,45 @@ getPlotDefs <- function(defs) {
   return(plotDefsObj(defs = unlist(defs)))
 }
 
-theme_std <- function(plotDefsObj) {
+theme_std <- function(plotDefsObj = plotDefs) {
   d <- plotDefsObj[["defs"]]
   t <- theme_classic() +
     theme(
       axis.text.x = element_text(
         size = as.numeric(d["font.size.axis"]),
         angle = as.numeric(d["font.angle.x"]),
-        hjust = 1,
+        vjust = 0.5,
+        hjust = 1.0,
       ),
       axis.text.y = element_text(
         size = as.numeric(d["font.size.axis"]),
         angle = as.numeric(d["font.angle.y"]),
+        vjust = 0.5,
+        hjust = 1.0,
       )
+    )
+
+  return(t)
+}
+
+theme_std_highres <- function(plotDefsObj) {
+  d <- plotDefsObj[["defs"]]
+  t <- theme_classic() +
+    theme(
+      plot.title = element_text(size = as.numeric(d["highres.font.size.title"])),
+      plot.subtitle = element_text(size = as.numeric(d["highres.font.size.subtitle"])),
+      axis.title = element_text(size = as.numeric(d["highres.font.size.subtitle"])),
+      axis.text.x = element_text(
+        angle = as.numeric(d["font.angle.x"]),
+        vjust = 0.5,
+        hjust = 0.5,
+      ),
+      axis.text.y = element_text(
+        angle = as.numeric(d["font.angle.y"]),
+      ),
+      axis.text = element_text(size = as.numeric(d["highres.font.size.axis"])),
+      legend.title = element_text(size = as.numeric(d["highres.font.size.legend"])),
+      legend.text = element_text(size = as.numeric(d["highres.font.size.legend"]))
     )
 
   return(t)

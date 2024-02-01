@@ -1,8 +1,14 @@
 #!/usr/bin/env -S bash
 
 BIN="star2table"
-# DEBUG=1
+# DEBUG=0
 
 make clean
+[ -z "${DEBUG}" ] || echo "Debug enabled"
 [ -z "${DEBUG}" ] && make release || make debug
-[ -z "${DEBUG}" ] && "./${BIN}" "${@}" || valgrind -s --track-origins=yes --leak-check=full "./${BIN}" "${@}"
+
+for i in wheat ptr; do
+    [ -z "${DEBUG}" ] && \
+        "./${BIN}" -o "${i}.tsv" -- ../../../data/star/*${i}*/Log.final.out ||
+        valgrind "./${BIN}" -o "${i}.tsv" -- ../../../data/star/*${i}*/Log.final.out
+done

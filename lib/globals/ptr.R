@@ -3,6 +3,7 @@ argv <- getArgs()
 conf <- getConf()
 
 # Fungi analysis
+LOWCOUNT <- 20
 SIG <- 0.01
 L2FC <- 2
 countThreshold <- 50
@@ -13,8 +14,9 @@ confPlots <- getConf("lib/graphics.toml")
 fileMat <- conf[["fungi"]][["counts"]]
 fileMeta <- conf[["fungi"]][["meta"]]
 fileTraits <- conf[["fungi"]][["traits"]]
-fileGoMap <- formatPath(conf[["data"]][["data"]], conf[["data"]][["go"]], paste(species, "map-go.txt", sep = "-"))
+fileGoMap <- formatPath(conf[["data"]][["data"]], conf[["data"]][["go"]], species, "map-go.txt")
 # fileGoNames is dynamically loaded
+goMap <- read.csv(fileGoMap, sep = "\t")
 
 dirClust <- formatPath(conf[["data"]][["data"]], conf[["data"]][["clust"]], species)
 

@@ -82,7 +82,7 @@ plotExprProfilesGo <- function(clustPlots, goMap, globalColours = FALSE) {
 
       p <- ggplot(d1, aes(x = count, y = group, fill = col)) +
         geom_bar(stat = "identity", position = "stack", orientation = "y") +
-        theme_std(plotDefs) +
+        theme_std_highres(plotDefs) +
         theme(
           axis.line = element_blank(),
           axis.ticks = element_blank(),
@@ -130,6 +130,8 @@ plotExprProfilesGoRestricted <- function(clustPlots, goMap, globalColours = FALS
       fileGoNames <- formatPath(conf[["data"]][["data"]], conf[["data"]][["go"]], species, qq("cellular_component-@{db}.txt"))
     }
 
+    print(qq("Database file: @{fileGoNames}"))
+
     goTermList[[i]] <- vector("character")
     for (j in 1:length(modules)) {
       goNames <- read.csv(fileGoNames, header = FALSE, sep = "\t")
@@ -162,11 +164,11 @@ plotExprProfilesGoRestricted <- function(clustPlots, goMap, globalColours = FALS
   for (i in 1:length(modules)) {
     clustPlots[[i]] <- list()
     for (j in 1:length(ont)) {
-      if (ont[i] == "BP") {
+      if (ont[j] == "BP") {
         fileGoNames <- formatPath(conf[["data"]][["data"]], conf[["data"]][["go"]], species, qq("biological_process-@{db}.txt"))
-      } else if (ont[i] == "MF") {
+      } else if (ont[j] == "MF") {
         fileGoNames <- formatPath(conf[["data"]][["data"]], conf[["data"]][["go"]], species, qq("molecular_function-@{db}.txt"))
-      } else if (ont[i] == "CC") {
+      } else if (ont[j] == "CC") {
         fileGoNames <- formatPath(conf[["data"]][["data"]], conf[["data"]][["go"]], species, qq("cellular_component-@{db}.txt"))
       }
 
@@ -178,8 +180,10 @@ plotExprProfilesGoRestricted <- function(clustPlots, goMap, globalColours = FALS
         unlist(strsplit(x, ";"))
       }))
 
-      goCount <- vector("integer", length = length(unique(terms)))
-      goCol <- vector("integer", length = length(unique(terms)))
+      ## goCount <- vector("integer", length = length(unique(terms)))
+      ## goCol <- vector("integer", length = length(unique(terms)))
+      goCount <- c()
+      goCol <- c()
       for (k in 1:length(unique(terms))) {
         goCount[k] <- sum(unique(terms)[k] == terms)
         goCol[k] <- goColours[unique(terms)[k] == names(goColours)]
@@ -209,12 +213,12 @@ plotExprProfilesGoRestricted <- function(clustPlots, goMap, globalColours = FALS
         geom_bar(stat = "identity", position = "stack", orientation = "y") +
         ## scale_fill_brewer(palette = "Set3") +
         ## scale_fill_viridis_d(option = "H") +
-        scale_fill_identity(
-          breaks = rev(d2[, "col"]),
-          labels = rev(d2[, "cat"]),
-          guide = "legend"
-        ) +
-        theme_std(plotDefs) +
+        ## scale_fill_identity(
+        ##   breaks = rev(d2[, "col"]),
+        ##   labels = rev(d2[, "cat"]),
+        ##   guide = "legend"
+        ## ) +
+        theme_std_highres(plotDefs) +
         theme(
           axis.line = element_blank(),
           axis.ticks = element_blank(),
@@ -229,9 +233,32 @@ plotExprProfilesGoRestricted <- function(clustPlots, goMap, globalColours = FALS
         ) +
         xlab("Distribution of GO terms")
 
+      if (globalColours == TRUE) {
+        p <- p + scale_fill_identity(
+          breaks = rev(d2[, "col"]),
+          labels = rev(d2[, "cat"]),
+          guide = "legend"
+        )
+      } else {
+        ## p <- p + scale_fill_brewer(
+        ##   name = qq("Term: @{ont[[i]]}"),
+        ##   palette = "Set3",
+        ##   breaks = rev(d2[, "col"]),
+        ##   labels = rev(d2[, "cat"]),
+        ## )
+        p <- p + scale_fill_viridis_d(
+          option = "H",
+          name = qq("Term: @{ont[[i]]}"),
+          breaks = rev(d2[, "col"]),
+          labels = rev(d2[, "cat"]),
+          )
+      }
+
       pLeg <- cowplot::get_legend(p + theme(legend.position = NULL))
 
       clustPlots[[i]][[j]] <- list(p, pLeg)
     }
   }
+
+  return(clustPlots)
 }

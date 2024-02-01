@@ -10,18 +10,32 @@ clust = "clust"
 genes = "genes"
 go = "go"
 plots = "plots"
+star = "star"
 tom = "tom"
 genesFungi = "data/genes/ptr"
 
 [analyses]
 contrast = "groupCultivarTime" # See meta.tsv for valid contrasts
 pca = true
+sdeg = true
+
+go_tf = true
+go_cwde = true
+go_defence = true
+go_transport = true
+go_intracellular_signalling = true
+go_kinases = true
+go_chromatin = true
+go_methylation = true
+go_rnai = true
+go_transposons = true
+effectors = true
 
 [factors]
 # Apply "Ordered" after a factor name to override the factor order
 control = ["control", "disease"]
 cultivar = ["Machete", "Magenta", "Phantom", "Wyalkatchem", "Yitpi", "ZWB11Q56", "ZWB12Q89"]
-cultivarOrdered = ["Machete", "Phantom", "Yitpi", "Magenta", "Wyalkatchem", "ZWB11Q56", "ZWB12Q89"]
+cultivarOrdered = ["Machete", "Phantom", "Yitpi", "Wyalkatchem", "Magenta", "ZWB11Q56", "ZWB12Q89"]
 rating = ["SVS", "MS", "MR", "R"]
 time = ["early", "late"]
 

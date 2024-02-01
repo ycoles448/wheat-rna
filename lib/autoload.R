@@ -9,7 +9,8 @@
 # path and appropriate compilers to install R packages
 
 # Change to preferred repository URL
-repo <- "https://cran.curtin.edu.au"
+## repo <- "https://cran.curtin.edu.au"
+repo <- "https://cran.csiro.au"
 
 # Load dependencies from file
 libs <- read.csv("rdeps.txt", sep = "\n", header = FALSE)

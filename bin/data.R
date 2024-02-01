@@ -12,8 +12,19 @@ loadData <- function(mat, meta, contrast, factors, nreps, species) {
   return(expData)
 }
 
-fixData <- function(expObj) {
+fixData <- function(expObj, removeLowCounts = TRUE) {
   colnames(expObj[["mat"]]) <- rownames(expObj[["meta"]])
+
+  if (removeLowCounts == TRUE) {
+    toRm <- c()
+    for (i in 1:nrow(expObj[["mat"]])) {
+      if (sum(expObj[["mat"]][i, ]) < LOWCOUNT && !(rownames(expObj[["mat"]])[i] %in% geneList[["genes"]])) {
+        toRm <- append(toRm, i)
+      }
+    }
+  }
+
+  expObj[["mat"]] <- expObj[["mat"]][-toRm, ]
 }
 
 loadExperimentData <- function(expObj, geneList, threshold) {
@@ -50,13 +61,16 @@ loadGeneList <- function(path) {
   absPath <- paste(getwd(), path, sep = sep)
   files <- list.files(absPath)
 
+  print("Loading genes from files:")
+  printf(qq("- @{files}\n"))
+
   # Also TODO: use formatPath()
 
   genes <- c()
+  x <- 0
   for (f in files) {
     name <- file_path_sans_ext(f)
     buffer <- fread(paste(absPath, f, sep = sep), header = FALSE)
-    x <- 0
     for (l in 1:length(buffer[[1]])) {
       x <- x + 1
       genes[x] <- buffer[[1]][l]
@@ -84,6 +98,27 @@ getTotalCounts <- function(counts, n) {
 
   return(totalCounts)
 }
+
+getCountsAvg <- function() {
+  exportCounts <- function(x) {
+    nreps <- expFactors$factorList$nreps
+    mat <- data.frame(matrix(nrow = nrow(x), ncol = ncol(x) / nreps))
+    for (i in nreps * (1:(ncol(x) / nreps))) {
+      mat[, i/nreps] <- rowSums((x[, (i - nreps + 1):(i)])) / nreps
+    }
+    colnames(mat) <- expFactors$factorList$group
+    rownames(mat) <- rownames(x)
+
+    return(mat)
+  }
+
+  countsRawAvg <<- exportCounts(countsRaw)
+  countsNormAvg <<- exportCounts(countsNorm)
+  countsRLAvg <<- exportCounts(countsRL)
+  countsVSAvg <<- exportCounts(countsVS)
+}
+
+
 
 stripNumbers <- function(x) {
   c <- 0
@@ -134,10 +169,11 @@ getModules <- function(clustRuns) {
       header = TRUE, sep = "\t"
     )
     counter <- append(counter, dim(clustRuns[[i]])[2])
+    ## print(str(clustRuns[[i]]))
   }
 
   # Only use Clust run with largest number of distinct modules
-  modules <- clustRuns[[which(counter == max(counter))]]
+  ## modules <- clustRuns[[which(counter == max(counter))]]
 
-  return(modules)
+  return(clustRuns)
 }

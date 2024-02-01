@@ -14,7 +14,18 @@ font.angle.x = 90
 font.angle.y = 0
 
 clr1 = "#FFFFFF"
-clr2 = "#FF0000"
+clr2 = "#884400"
+
+[plots.highres]
+size.std.x = 6000
+size.std.y = 6000
+
+font.size.title = 36
+font.size.subtitle = 30
+font.size.axis = 24
+font.size.tick = 18
+font.size.legend = 24
+font.size.label = 18
 
 [plots.names]
 barplot.totalCounts.title = "Total gene counts per group"

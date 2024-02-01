@@ -26,6 +26,90 @@ getResultsList <- function(dds, expObj, expObjFactors, alpha = SIG) {
   return(resultsList)
 }
 
+getSDEG <- function(geneVec) {
+  nfactors = length(expFactors[["factorList"]][["factors"]])
+  lim <- 0
+
+  sdegGroups <- list()
+  genes <- c()
+  genesDn <- c()
+  genesUp <- c()
+
+  for (i in lower1:upper1) {
+    g1 <- expFactors$factorList$group[i]
+    printf("Set %i\n", i)
+    sdegGroups[[i]] <- list()
+
+    for (j in (lower2 + lim):upper2) {
+      g2 <- expFactors$factorList$group[j]
+
+      printf("Groups: %-20s", g1)
+      printf("\t%-20s\n", g2)
+
+      sdeg <- results(
+        dds,
+        alpha = SIG,
+        contrast = c(contrast, g1, g2),
+        parallel = TRUE
+      )
+      sdeg <- sdeg[which(!is.na(sdeg[, "padj"])), ]
+      sdegGroups[[i]][[j - 1 - lim]] <- sdeg[sdeg[, "padj"] < SIG & abs(sdeg[, "log2FoldChange"]) > L2FC, ]
+      genes <- append(genes, rownames(sdeg[sdeg[, "padj"] < SIG & abs(sdeg[, "log2FoldChange"]) > L2FC, ]))
+      genesDn <- append(genesDn, rownames(sdeg[sdeg[, "padj"] < SIG & sdeg[, "log2FoldChange"] < -L2FC, ]))
+      genesUp <- append(genesUp, rownames(sdeg[sdeg[, "padj"] < SIG & sdeg[, "log2FoldChange"] > +L2FC, ]))
+    }
+    lim <- lim + 1
+    printf("\n")
+  }
+
+  i <- i + 1
+  sdegGroups[[i]] <- list()
+  printf("Set %i\n", i)
+  for (k in 1:length(expFactors$factorList$cultivar) * 2 - 1) {
+    g1 <- expFactors$factorList$group[k + 1]
+    g2 <- expFactors$factorList$group[k]
+
+    printf("Groups: %-20s", g1)
+    printf("\t%-20s\n", g2)
+
+    sdeg <- results(
+      dds,
+      alpha = SIG,
+      contrast = c(contrast, g1, g2),
+      parallel = TRUE
+    )
+    sdeg <- sdeg[which(!is.na(sdeg[, "padj"])), ]
+    sdegGroups[[i]][[(k + 1) / 2]] <- sdeg[sdeg[, "padj"] < SIG & abs(sdeg[, "log2FoldChange"]) > L2FC, ]
+    genes <- append(genes, rownames(sdeg[sdeg[, "padj"] < SIG & abs(sdeg[, "log2FoldChange"]) > L2FC, ]))
+    genesDn <- append(genesDn, rownames(sdeg[sdeg[, "padj"] < SIG & (sdeg[, "log2FoldChange"]) < -L2FC, ]))
+    genesUp <- append(genesUp, rownames(sdeg[sdeg[, "padj"] < SIG & (sdeg[, "log2FoldChange"]) > +L2FC, ]))
+  }
+
+  geneVec$names <- unique(genes)
+  geneVec$dn <- unique(genesDn)
+  geneVec$up <- unique(genesUp)
+
+  return(sdegGroups)
+}
+
+getSDEGTop <- function(sdegGroups, n) {
+  lim <- 0
+  sdeg <- c()
+  for (i in lower1:upper1) {
+    for (j in (lower2 + lim):upper2) {
+      ## sdegTop <- rbind(sdegTop, data.frame(sdegGroups[[i]][[j - 1 - lim]]) %>% arrange(padj))
+      sdeg <- rbind(sdeg, data.frame(sdegGroups[[i]][[j - 1 - lim]]))
+    }
+
+    lim <- lim + 1
+  }
+
+  sdeg <- head(sdeg %>% arrange(padj), n)
+  return(sdeg)
+}
+
+# DEPRECATED: See above functions
+{
 getDifferentialGenes <- function(resultsList, expObjFactors, alpha = SIG, l2fc = L2FC) {
   k <- length(expObjFactors[["factorList"]][["group"]])
   n <- 1
@@ -207,4 +291,5 @@ plotDifferentialGenes <- function(sdegList, expObjFactors, plotDefs, offsetR = 0
 
   plotList <- list(plotList, legends)
   return(plotList)
+}
 }
